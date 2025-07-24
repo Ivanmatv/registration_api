@@ -34,7 +34,10 @@ class AuthRequestView(APIView):
             print(f"Код подтверждения для {phone}: {auth_code}")  # Для тестирования
 
             time.sleep(2)  # Имитация задержки
-            return Response({'message': 'Код отправлен', f'Код подтверждения для {phone}: {auth_code}'})
+            return Response({
+                'message': 'Код отправлен',
+                'debug': f'Код подтверждения для {phone}: {auth_code}'
+            })
 
         return Response(serializer.errors, status=400)
 
@@ -60,7 +63,7 @@ class AuthVerifyView(APIView):
             # Создаем/получаем пользователя
             user, created = CustomUser.objects.get_or_create(phone=stored_phone)
 
-            if created or not hasattr(user, 'profile'):
+            if not hasattr(user, 'profile'):
                 profile = Profile.objects.create(user=user)
                 profile.invite_code = Profile.generate_invite_code()
                 profile.save()
@@ -85,7 +88,14 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        profile = request.user.profile
+        try:
+            profile = request.user.profile
+        except Profile.DoesNotExist:
+            # Если профиль не существует - создаем
+            profile = Profile.objects.create(user=request.user)
+            profile.invite_code = Profile.generate_invite_code()
+            profile.save()
+
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
