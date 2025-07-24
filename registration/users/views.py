@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser, Profile
 from .serializers import (
@@ -33,7 +34,7 @@ class AuthRequestView(APIView):
             print(f"Код подтверждения для {phone}: {auth_code}")  # Для тестирования
 
             time.sleep(2)  # Имитация задержки
-            return Response({'message': 'Код отправлен', 'Код подтверждения для {phone}: {auth_code}'})
+            return Response({'message': 'Код отправлен', f'Код подтверждения для {phone}: {auth_code}'})
 
         return Response(serializer.errors, status=400)
 
@@ -69,8 +70,12 @@ class AuthVerifyView(APIView):
             request.session.pop('auth_code', None)
             request.session.pop('auth_code_expires', None)
 
-            login(request, user)
-            return Response({'message': 'Успешная авторизация'})
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'message': 'Успешная авторизация',
+                'access': str(refresh.access_token),
+                'refresh': str(refresh)
+            })
 
         return Response(serializer.errors, status=400)
 
