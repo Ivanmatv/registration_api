@@ -33,7 +33,7 @@ class AuthRequestView(APIView):
             print(f"Код подтверждения для {phone}: {auth_code}")  # Для тестирования
 
             time.sleep(2)  # Имитация задержки
-            return Response({'message': 'Код отправлен'})
+            return Response({'message': 'Код отправлен', 'Код подтверждения для {phone}: {auth_code}'})
 
         return Response(serializer.errors, status=400)
 

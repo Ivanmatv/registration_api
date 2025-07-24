@@ -7,7 +7,12 @@ import string
 class CustomUser(AbstractUser):
     """Абстарктная модель пользователя"""
     phone = models.CharField(max_length=15, unique=True)
+
+    # Убираем ненужные поля
     username = None
+    groups = None
+    user_permissions = None
+
     USERNAME_FIELD = 'phone'
     REQUIRED_FIELDS = []
 
