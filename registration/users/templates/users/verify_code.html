@@ -20,6 +20,7 @@
                         {% endif %}
                         
                         <p>Код отправлен на номер <strong>{{ request.session.auth_phone }}</strong></p>
+                        <p>Код <strong>{{ request.session.auth_code }}</strong></p>
                         
                         <form method="post">
                             {% csrf_token %}

@@ -3,6 +3,7 @@ import string
 import time
 
 from django.shortcuts import render, redirect
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from rest_framework.views import APIView
@@ -196,7 +197,6 @@ def verify_code(request):
         request.session.pop('auth_code_expires', None)
 
         # Логиним пользователя
-        from django.contrib.auth import login
         login(request, user)
 
         messages.success(request, 'Успешная авторизация!')
